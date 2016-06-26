@@ -25,10 +25,10 @@ public class MainActivity extends AppCompatActivity {
                 TextView dataField = (TextView) findViewById(R.id.datatab_data);
                 switch (msg.what) {
                     case Constants.WORKER_EXIT_SUCCESS:
-                        dataField.append("Got data:\n");
+                        dataField.setText("Got data:\n");
                         break;
                     case Constants.WORKER_FATAL_ERROR:
-                        dataField.append("Got fatal error:\n");
+                        dataField.setText("Got fatal error:\n");
                         break;
                 }
                 dataField.append(msg.obj.toString());

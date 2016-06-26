@@ -29,6 +29,22 @@ class TagRead extends Thread {
         return new String(hexChars);
     }
 
+    // See: https://stackoverflow.com/questions/13209364/convert-c-crc16-to-java-crc16
+    static int crc16(final byte[] buffer) {
+        int crc = 0xFFFF;
+
+        for (int j = 0; j < buffer.length ; j++) {
+            crc = ((crc  >>> 8) | (crc  << 8) )& 0xffff;
+            crc ^= (buffer[j] & 0xff);//byte to int, trunc sign
+            crc ^= ((crc & 0xff) >> 4);
+            crc ^= (crc << 12) & 0xffff;
+            crc ^= ((crc & 0xFF) << 5) & 0xffff;
+        }
+        crc &= 0xffff;
+        return crc;
+
+    }
+
     @Override
     public void run() {
         MifareUltralight iso = MifareUltralight.get(tag);
