@@ -7,9 +7,7 @@
     <TabHost
         android:id="@+id/tabhost"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -38,8 +36,8 @@
                         android:layout_row="0"
                         android:layout_column="0"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:text="Sensor info:"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/sensor_info"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#000000"/>
@@ -50,8 +48,8 @@
                         android:layout_row="0"
                         android:layout_column="1"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:text="(no data)"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/no_data"
                         android:textSize="20sp"/>
                     <TextView
                         android:layout_width="wrap_content"
@@ -59,8 +57,8 @@
                         android:layout_row="1"
                         android:layout_column="0"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:text="Sensor type:"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/sensor_type"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#000000"/>
@@ -71,8 +69,8 @@
                         android:layout_row="1"
                         android:layout_column="1"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:text="(no data)"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/no_data"
                         android:textSize="20sp"/>
                     <View
                         android:layout_width="match_parent"
@@ -88,8 +86,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
+                        android:layout_marginStart="10dp"
                         android:layout_columnSpan="10"
-                        android:text="Really detailed data..."
+                        android:text="@string/data_placeholder"
                         android:textSize="20sp"/>
 
                 </GridLayout>
@@ -106,8 +105,8 @@
                         android:layout_row="0"
                         android:layout_column="0"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:text="Sensor info:"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/sensor_info"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#000000"/>
@@ -118,8 +117,8 @@
                         android:layout_row="0"
                         android:layout_column="1"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:text="(no data)"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/no_data"
                         android:textSize="20sp"/>
                     <TextView
                         android:layout_width="wrap_content"
@@ -127,8 +126,8 @@
                         android:layout_row="1"
                         android:layout_column="0"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:text="Sensor type:"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/sensor_type"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#000000"/>
@@ -139,8 +138,8 @@
                         android:layout_row="1"
                         android:layout_column="1"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:text="(no data)"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/no_data"
                         android:textSize="20sp"/>
                     <View
                         android:layout_width="match_parent"
@@ -157,8 +156,8 @@
                         android:layout_row="3"
                         android:layout_column="0"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:text="Name:"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/name"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#000000"/>
@@ -169,8 +168,8 @@
                         android:layout_row="3"
                         android:layout_column="1"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:text="(no data)"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/no_data"
                         android:textSize="20sp"/>
                     <TextView
                         android:layout_width="wrap_content"
@@ -178,8 +177,8 @@
                         android:layout_row="4"
                         android:layout_column="0"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:text="PAN ID:"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/pan_id"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#000000"/>
@@ -190,8 +189,8 @@
                         android:layout_row="4"
                         android:layout_column="1"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:text="(no data)"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/no_data"
                         android:textSize="20sp"/>
                     <TextView
                         android:layout_width="wrap_content"
@@ -199,8 +198,8 @@
                         android:layout_row="5"
                         android:layout_column="0"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:text="Channel:"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/chanel"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#000000"/>
@@ -211,8 +210,8 @@
                         android:layout_row="5"
                         android:layout_column="1"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:text="(no data)"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/no_data"
                         android:textSize="20sp"/>
                 </GridLayout>
 
@@ -225,7 +224,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="Really detailed help section..." />
+                        android:text="@string/help_text" />
                 </LinearLayout>
             </FrameLayout>
         </LinearLayout>

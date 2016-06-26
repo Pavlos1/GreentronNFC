@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">NFC Configuration</string>
+    <string name="no_data">(no data)</string>
+    <string name="sensor_info">Sensor info:</string>
+    <string name="sensor_type">Sensor type:</string>
+    <string name="data_placeholder">Really detailed data . . . </string>
+    <string name="name">Name:</string>
+    <string name="pan_id">PAN ID:</string>
+    <string name="chanel">Chanel:</string>
+    <string name="help_text">Really detailed help section . . .</string>
 </resources>
