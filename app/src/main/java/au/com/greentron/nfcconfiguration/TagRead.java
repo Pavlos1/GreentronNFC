@@ -29,31 +29,96 @@ class TagRead extends Thread {
         return new String(hexChars);
     }
 
-    // See: https://stackoverflow.com/questions/13209364/convert-c-crc16-to-java-crc16
-    static int crc16(final byte[] buffer) {
-        int crc = 0xFFFF;
-
-        for (int j = 0; j < buffer.length ; j++) {
-            crc = ((crc  >>> 8) | (crc  << 8) )& 0xffff;
-            crc ^= (buffer[j] & 0xff);//byte to int, trunc sign
-            crc ^= ((crc & 0xff) >> 4);
-            crc ^= (crc << 12) & 0xffff;
-            crc ^= ((crc & 0xFF) << 5) & 0xffff;
-        }
-        crc &= 0xffff;
-        return crc;
-
-    }
-
     @Override
     public void run() {
         MifareUltralight iso = MifareUltralight.get(tag);
         try {
             iso.connect();
             iso.setTimeout(5000);
-            byte[] command = {0x3a, 0x00, 0x01};
+
+            // Check magic header at 0x80, "GRTN"
+            // Java bytes are signed, so it thinks 0x80/0x8d is negative if I apply (byte).
+            // This will not affect the representation in memory, however.
+            byte[] command = {0x3a, (byte) 0x80, (byte) 0x8d};
             byte[] result = iso.transceive(command);
-            uiHandler.obtainMessage(Constants.WORKER_EXIT_SUCCESS, bytesToHex(result)).sendToTarget();
+            if ((result[0] != 'G') || (result[1] != 'T') || (result[2] != 'R')
+                    || (result[3] != 'N')) {
+                uiHandler.obtainMessage(Constants.WORKER_FATAL_ERROR,
+                        "Wrong magic header").sendToTarget();
+                return;
+            }
+
+            // The checksum is simply a summation of all the bytes,
+            // including the header, mod 0xffffffff
+            long checksum = 0;
+            int i;
+            for (i=0; i<4*0x0D; i++) {
+                checksum = (checksum + (result[i] & 0xFF)) % 0xffffffffL;
+            }
+
+            long reported_checksum = 0;
+            for (i=0; i<4; i++) {
+                // & 0xFF coerces the bytes to be signed
+                // Also (3-i) because data is transmitted MSB first
+                reported_checksum += ((result[i +  4*0x0D] & 0xFF) << 8*(3-i));
+            }
+            if (checksum != reported_checksum) {
+                uiHandler.obtainMessage(Constants.WORKER_FATAL_ERROR,
+                        "Checksum incorrect\nActual: "+String.valueOf(checksum)+"\nReported: "
+                                +String.valueOf(reported_checksum)+"\n").sendToTarget();
+                return;
+            }
+
+            long sensor_type = 0;
+            long pan_id = 0;
+            long channel = 0;
+            for (i=0; i<4; i++) {
+                sensor_type += ((result[i + 4*0x02] & 0xFF) << (3-i)*8);
+                pan_id += ((result[i + 4*0x03] & 0xFF) << (3-i)*8);
+                channel += ((result[i + 4*0x04] & 0xFF) << (3-i)*8);
+            }
+            if (sensor_type > 65536) {
+                uiHandler.obtainMessage(Constants.WORKER_FATAL_ERROR,
+                        "Sensor type: field too long").sendToTarget();
+                return;
+            }
+            if (pan_id > 65536) {
+                uiHandler.obtainMessage(Constants.WORKER_FATAL_ERROR,
+                        "PAN ID: field too long").sendToTarget();
+                return;
+            }
+            if (channel > 65536) {
+                uiHandler.obtainMessage(Constants.WORKER_FATAL_ERROR,
+                        "Channel: field too long").sendToTarget();
+                return;
+            }
+
+            // Get name (32 ASCII chars)
+            int name_length = 0;
+            for (i=0; i<32; i++) {
+                if (result[i + 4*0x05] < 0) {
+                    uiHandler.obtainMessage(Constants.WORKER_FATAL_ERROR,
+                            "Name: non-ASCII characters detected").sendToTarget();
+                    return;
+                }
+                if (result[i + 4*0x05] == 0) {
+                    name_length = i + 1;
+                    break;
+                }
+            }
+            if (name_length == 0) { name_length = 32; }
+            byte[] name = new byte[name_length];
+            for (i=0; i<name_length; i++) {
+                name[i] = result[i + 4*0x05];
+            }
+
+            Configuration obj = new Configuration();
+            obj.sensor_type = sensor_type;
+            obj.pan_id = pan_id;
+            obj.channel = channel;
+            obj.name = new String(name, "ISO-8859-1");
+            uiHandler.obtainMessage(Constants.WORKER_EXIT_SUCCESS, obj).sendToTarget();
+
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

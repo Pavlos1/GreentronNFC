@@ -6,6 +6,6 @@
     <string name="data_placeholder">Really detailed data . . . </string>
     <string name="name">Name:</string>
     <string name="pan_id">PAN ID:</string>
-    <string name="chanel">Chanel:</string>
+    <string name="channel">Channel:</string>
     <string name="help_text">Really detailed help section . . .</string>
 </resources>

@@ -13,6 +13,11 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
     Handler uiHandler;
     NfcAdapter.ReaderCallback readerCallback;
+    TextView dataSensorType;
+    TextView configSensorType;
+    TextView configName;
+    TextView configPAN_ID;
+    TextView configChannel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,14 +30,19 @@ public class MainActivity extends AppCompatActivity {
                 TextView dataField = (TextView) findViewById(R.id.datatab_data);
                 switch (msg.what) {
                     case Constants.WORKER_EXIT_SUCCESS:
-                        dataField.setText("Got data:\n");
+                        Configuration config = (Configuration) msg.obj;
+                        dataSensorType.setText(String.valueOf(config.sensor_type));
+                        configSensorType.setText(String.valueOf(config.sensor_type));
+                        configName.setText(config.name);
+                        configPAN_ID.setText(String.valueOf(config.pan_id));
+                        configChannel.setText(String.valueOf(config.channel));
                         break;
                     case Constants.WORKER_FATAL_ERROR:
                         dataField.setText("Got fatal error:\n");
+                        dataField.append(msg.obj.toString());
+                        dataField.append("\n");
                         break;
                 }
-                dataField.append(msg.obj.toString());
-                dataField.append("\n");
             }
         };
 
@@ -56,6 +66,12 @@ public class MainActivity extends AppCompatActivity {
         spec.setContent(R.id.helptab);
         spec.setIndicator("Help");
         tabHost.addTab(spec);
+
+        dataSensorType = (TextView) findViewById(R.id.datatab_sensor_type);
+        configSensorType = (TextView) findViewById(R.id.configtab_sensor_type);
+        configName = (TextView) findViewById(R.id.sensor_name);
+        configPAN_ID = (TextView) findViewById(R.id.panid);
+        configChannel = (TextView) findViewById(R.id.channel);
 
         NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getApplicationContext());
         readerCallback = new NfcAdapter.ReaderCallback() {
