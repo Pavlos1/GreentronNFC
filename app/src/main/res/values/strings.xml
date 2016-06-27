@@ -8,4 +8,8 @@
     <string name="pan_id">PAN ID:</string>
     <string name="channel">Channel:</string>
     <string name="help_text">Really detailed help section . . .</string>
+    <string name="edit_config">Edit Config</string>
+    <string name="flash">Flash</string>
+    <string name="enter_serial_number">For security purposes, please enter the (hexadecimal) serial number of this device.</string>
+    <string name="serial_hint">0000000000</string>
 </resources>

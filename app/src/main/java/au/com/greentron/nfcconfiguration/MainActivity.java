@@ -1,5 +1,9 @@
 package au.com.greentron.nfcconfiguration;
 
+import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.content.res.XmlResourceParser;
+import android.graphics.Color;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -7,6 +11,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TabHost;
 import android.widget.TextView;
 
@@ -18,35 +26,21 @@ public class MainActivity extends AppCompatActivity {
     TextView configName;
     TextView configPAN_ID;
     TextView configChannel;
+    Button editConfig;
+    Toolbar actionBar;
+    TabHost tabHost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        uiHandler = new Handler(Looper.getMainLooper()) {
-            @Override
-            public void handleMessage(Message msg) {
-                TextView dataField = (TextView) findViewById(R.id.datatab_data);
-                switch (msg.what) {
-                    case Constants.WORKER_EXIT_SUCCESS:
-                        Configuration config = (Configuration) msg.obj;
-                        dataSensorType.setText(String.valueOf(config.sensor_type));
-                        configSensorType.setText(String.valueOf(config.sensor_type));
-                        configName.setText(config.name);
-                        configPAN_ID.setText(String.valueOf(config.pan_id));
-                        configChannel.setText(String.valueOf(config.channel));
-                        break;
-                    case Constants.WORKER_FATAL_ERROR:
-                        dataField.setText("Got fatal error:\n");
-                        dataField.append(msg.obj.toString());
-                        dataField.append("\n");
-                        break;
-                }
-            }
-        };
+        // The action bar was replaced to allow editing, so this is necessary
+        actionBar = (Toolbar) findViewById(R.id.action_toolbar);
+        setSupportActionBar(actionBar);
 
-        TabHost tabHost = (TabHost) findViewById(R.id.tabhost);
+        // Setup tabs
+        tabHost = (TabHost) findViewById(R.id.tabhost);
         tabHost.setup();
 
         // Data Tab
@@ -67,12 +61,55 @@ public class MainActivity extends AppCompatActivity {
         spec.setIndicator("Help");
         tabHost.addTab(spec);
 
+        // Set tab label size
+        for(int i=0; i<tabHost.getTabWidget().getChildCount(); i++)
+        {
+            TextView tv = (TextView) tabHost.getTabWidget().getChildAt(i).findViewById(android.R.id.title);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        }
+
+        // Handles to UI elements
         dataSensorType = (TextView) findViewById(R.id.datatab_sensor_type);
         configSensorType = (TextView) findViewById(R.id.configtab_sensor_type);
         configName = (TextView) findViewById(R.id.sensor_name);
         configPAN_ID = (TextView) findViewById(R.id.panid);
         configChannel = (TextView) findViewById(R.id.channel);
+        editConfig = (Button) findViewById(R.id.enter_config_setup);
 
+        // Receive result from TagRead output
+        uiHandler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                TextView dataField = (TextView) findViewById(R.id.datatab_data);
+                switch (msg.what) {
+                    case Constants.WORKER_EXIT_SUCCESS:
+                        Configuration config = (Configuration) msg.obj;
+                        dataSensorType.setText(String.valueOf(config.sensor_type));
+                        configSensorType.setText(String.valueOf(config.sensor_type));
+                        configName.setText(config.name);
+                        configPAN_ID.setText(String.valueOf(config.pan_id));
+                        configChannel.setText(String.valueOf(config.channel));
+
+                        editConfig.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent intent = new Intent(getApplicationContext(), EditConfig.class);
+                                startActivity(intent);
+                            }
+                        });
+
+                        editConfig.setEnabled(true);
+                        break;
+                    case Constants.WORKER_FATAL_ERROR:
+                        dataField.setText("Got fatal error:\n");
+                        dataField.append(msg.obj.toString());
+                        dataField.append("\n");
+                        break;
+                }
+            }
+        };
+
+        // Set up NFC callback, handled by TagRead
         NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getApplicationContext());
         readerCallback = new NfcAdapter.ReaderCallback() {
             @Override
