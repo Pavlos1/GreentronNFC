@@ -1,9 +1,6 @@
 package au.com.greentron.nfcconfiguration;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.content.res.XmlResourceParser;
-import android.graphics.Color;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -68,6 +65,9 @@ public class MainActivity extends AppCompatActivity {
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         }
 
+        // By deafult, open help tab
+        tabHost.setCurrentTab(2);
+
         // Handles to UI elements
         dataSensorType = (TextView) findViewById(R.id.datatab_sensor_type);
         configSensorType = (TextView) findViewById(R.id.configtab_sensor_type);
@@ -81,6 +81,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void handleMessage(Message msg) {
                 TextView dataField = (TextView) findViewById(R.id.datatab_data);
+
+                // If user is currently on help tab, direct them to data tab
+                if (tabHost.getCurrentTab() == 2) { tabHost.setCurrentTab(0); }
+
                 switch (msg.what) {
                     case Constants.WORKER_EXIT_SUCCESS:
                         Configuration config = (Configuration) msg.obj;
@@ -92,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
                         dataField.setText("Got data:\n");
                         for (int i=0; i<config.data.length; i++) {
-                            dataField.append("Byte ");
+                            dataField.append("Page ");
                             dataField.append(String.valueOf(i));
                             dataField.append(": ");
                             dataField.append(String.valueOf(config.data[i]));
