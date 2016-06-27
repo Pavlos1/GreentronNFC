@@ -39,7 +39,7 @@ class TagRead extends Thread {
             // Check magic header at 0x80, "GRTN"
             // Java bytes are signed, so it thinks 0x80/0x8d is negative if I apply (byte).
             // This will not affect the representation in memory, however.
-            byte[] command = {0x3a, (byte) 0x80, (byte) 0x8d};
+            byte[] command = {0x3a, (byte) 0x80, (byte) 0x91};
             byte[] result = iso.transceive(command);
             if ((result[0] != 'G') || (result[1] != 'T') || (result[2] != 'R')
                     || (result[3] != 'N')) {
@@ -51,8 +51,8 @@ class TagRead extends Thread {
             // The checksum is simply a summation of all the bytes,
             // including the header, mod 0xffffffff
             long checksum = 0;
-            int i;
-            for (i=0; i<4*0x0D; i++) {
+            int i, j;
+            for (i=0; i<4*0x11; i++) {
                 checksum = (checksum + (result[i] & 0xFF)) % 0xffffffffL;
             }
 
@@ -60,7 +60,7 @@ class TagRead extends Thread {
             for (i=0; i<4; i++) {
                 // & 0xFF coerces the bytes to be signed
                 // Also (3-i) because data is transmitted MSB first
-                reported_checksum += ((result[i +  4*0x0D] & 0xFF) << 8*(3-i));
+                reported_checksum += ((result[i +  4*0x11] & 0xFF) << 8*(3-i));
             }
             if (checksum != reported_checksum) {
                 uiHandler.obtainMessage(Constants.WORKER_FATAL_ERROR,
@@ -69,13 +69,21 @@ class TagRead extends Thread {
                 return;
             }
 
+            // Each variable is stored, like the checksum, MSB first in four bytes
+            // Hence, the first byte contributes (result[4*page] << 24), the second byte
+            // (result[4*page + 1] << 16) and so on (Again, & 0xFF just coerces everything
+            // to be positive)
             long sensor_type = 0;
             long pan_id = 0;
             long channel = 0;
+            long data[] = {0L, 0L, 0L, 0L};
             for (i=0; i<4; i++) {
                 sensor_type += ((result[i + 4*0x02] & 0xFF) << (3-i)*8);
                 pan_id += ((result[i + 4*0x03] & 0xFF) << (3-i)*8);
                 channel += ((result[i + 4*0x04] & 0xFF) << (3-i)*8);
+                for (j=0; j<4; j++) {
+                    data[j] += ((result[i + 4*(0x0D+1)] & 0xFF) << (3-i)*8);
+                }
             }
             if (sensor_type > 65536) {
                 uiHandler.obtainMessage(Constants.WORKER_FATAL_ERROR,
@@ -117,6 +125,7 @@ class TagRead extends Thread {
             obj.pan_id = pan_id;
             obj.channel = channel;
             obj.name = new String(name, "ISO-8859-1");
+            obj.data = data;
             uiHandler.obtainMessage(Constants.WORKER_EXIT_SUCCESS, obj).sendToTarget();
 
         } catch (Exception e) {

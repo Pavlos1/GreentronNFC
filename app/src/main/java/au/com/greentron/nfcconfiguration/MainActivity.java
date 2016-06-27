@@ -90,6 +90,15 @@ public class MainActivity extends AppCompatActivity {
                         configPAN_ID.setText(String.valueOf(config.pan_id));
                         configChannel.setText(String.valueOf(config.channel));
 
+                        dataField.setText("Got data:\n");
+                        for (int i=0; i<config.data.length; i++) {
+                            dataField.append("Byte ");
+                            dataField.append(String.valueOf(i));
+                            dataField.append(": ");
+                            dataField.append(String.valueOf(config.data[i]));
+                            dataField.append("\n");
+                        }
+
                         editConfig.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
