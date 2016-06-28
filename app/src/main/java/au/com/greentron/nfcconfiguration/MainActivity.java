@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.TabHost;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 public class MainActivity extends AppCompatActivity {
     Handler uiHandler;
     NfcAdapter.ReaderCallback readerCallback;
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     Button editConfig;
     Toolbar actionBar;
     TabHost tabHost;
+    Configuration config;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (msg.what) {
                     case Constants.WORKER_EXIT_SUCCESS:
-                        Configuration config = (Configuration) msg.obj;
+                        config = (Configuration) msg.obj;
                         dataSensorType.setText(String.valueOf(config.sensor_type));
                         configSensorType.setText(String.valueOf(config.sensor_type));
                         configName.setText(config.name);
@@ -107,6 +110,8 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(View view) {
                                 Intent intent = new Intent(getApplicationContext(), EditConfig.class);
+                                Gson gson = new Gson();
+                                intent.putExtra("config", gson.toJson(config));
                                 startActivity(intent);
                             }
                         });
