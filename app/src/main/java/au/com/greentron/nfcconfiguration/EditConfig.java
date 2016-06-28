@@ -1,5 +1,10 @@
 package au.com.greentron.nfcconfiguration;
 
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +25,7 @@ public class EditConfig extends AppCompatActivity {
     EditText serial_numberEntry;
     Button flashButton;
     Configuration config;
+    Handler uiHandler;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {;
@@ -33,6 +39,29 @@ public class EditConfig extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_config);
+
+        // Mainly for creating toasts
+        uiHandler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case Constants.WORKER_PRINT_MESSAGE:
+                        Toast.makeText(getApplicationContext(), msg.obj.toString(), Toast.LENGTH_LONG).show();
+                }
+            }
+        };
+
+        // Any tags detected will trigger an alert (and not launch another app!!)
+        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getApplicationContext());
+        NfcAdapter.ReaderCallback readerCallback = new NfcAdapter.ReaderCallback() {
+            @Override
+            public void onTagDiscovered(Tag tag) {
+                uiHandler.obtainMessage(Constants.WORKER_PRINT_MESSAGE,
+                        "Press \"FLASH\" before approaching tag").sendToTarget();
+            }
+        };
+        int nfcflags = NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK | NfcAdapter.FLAG_READER_NFC_A;
+        nfcAdapter.enableReaderMode(this, readerCallback, nfcflags, new Bundle());
 
         // Get configuration object passed from MainActivity
         String configStr = getIntent().getExtras().getString("config");
