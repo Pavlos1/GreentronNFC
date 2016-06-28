@@ -29,6 +29,40 @@ public class MainActivity extends AppCompatActivity {
     Toolbar actionBar;
     TabHost tabHost;
     Configuration config;
+    TextView dataField;
+
+    private boolean updateUIElements() {
+        if (config == null) {
+            return false;
+        }
+        dataSensorType.setText(String.valueOf(config.sensor_type));
+        configSensorType.setText(String.valueOf(config.sensor_type));
+        configName.setText(config.name);
+        configPAN_ID.setText(String.valueOf(config.pan_id));
+        configChannel.setText(String.valueOf(config.channel));
+
+        dataField.setText("Got data:\n");
+        for (int i=0; i<config.data.length; i++) {
+            dataField.append("Page ");
+            dataField.append(String.valueOf(i));
+            dataField.append(": ");
+            dataField.append(String.valueOf(config.data[i]));
+            dataField.append("\n");
+        }
+
+        editConfig.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), EditConfig.class);
+                Gson gson = new Gson();
+                intent.putExtra("config", gson.toJson(config));
+                startActivity(intent);
+            }
+        });
+
+        editConfig.setEnabled(true);
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +102,6 @@ public class MainActivity extends AppCompatActivity {
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         }
 
-        // By deafult, open help tab
-        tabHost.setCurrentTab(2);
-
         // Handles to UI elements
         dataSensorType = (TextView) findViewById(R.id.datatab_sensor_type);
         configSensorType = (TextView) findViewById(R.id.configtab_sensor_type);
@@ -78,50 +109,34 @@ public class MainActivity extends AppCompatActivity {
         configPAN_ID = (TextView) findViewById(R.id.panid);
         configChannel = (TextView) findViewById(R.id.channel);
         editConfig = (Button) findViewById(R.id.enter_config_setup);
+        dataField = (TextView) findViewById(R.id.datatab_data);
+
+        // Get config object if it's been saved for us, and update UI elements
+        tabHost.setCurrentTab(2);
+        if (savedInstanceState != null) {
+            Gson gson = new Gson();
+            config = gson.fromJson(savedInstanceState.getString("config"), Configuration.class);
+            updateUIElements();
+            tabHost.setCurrentTab(savedInstanceState.getInt("current_tab"));
+        }
 
         // Receive result from TagRead output
         uiHandler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message msg) {
-                TextView dataField = (TextView) findViewById(R.id.datatab_data);
-
                 // If user is currently on help tab, direct them to data tab
                 if (tabHost.getCurrentTab() == 2) { tabHost.setCurrentTab(0); }
 
                 switch (msg.what) {
                     case Constants.WORKER_EXIT_SUCCESS:
                         config = (Configuration) msg.obj;
-                        dataSensorType.setText(String.valueOf(config.sensor_type));
-                        configSensorType.setText(String.valueOf(config.sensor_type));
-                        configName.setText(config.name);
-                        configPAN_ID.setText(String.valueOf(config.pan_id));
-                        configChannel.setText(String.valueOf(config.channel));
-
-                        dataField.setText("Got data:\n");
-                        for (int i=0; i<config.data.length; i++) {
-                            dataField.append("Page ");
-                            dataField.append(String.valueOf(i));
-                            dataField.append(": ");
-                            dataField.append(String.valueOf(config.data[i]));
-                            dataField.append("\n");
-                        }
-
-                        editConfig.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Intent intent = new Intent(getApplicationContext(), EditConfig.class);
-                                Gson gson = new Gson();
-                                intent.putExtra("config", gson.toJson(config));
-                                startActivity(intent);
-                            }
-                        });
-
-                        editConfig.setEnabled(true);
+                        updateUIElements();
                         break;
                     case Constants.WORKER_FATAL_ERROR:
                         dataField.setText("Got fatal error:\n");
                         dataField.append(msg.obj.toString());
                         dataField.append("\n");
+                        tabHost.setCurrentTab(0);
                         break;
                 }
             }
@@ -137,5 +152,14 @@ public class MainActivity extends AppCompatActivity {
         };
         int nfcflags = NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK | NfcAdapter.FLAG_READER_NFC_A;
         nfcAdapter.enableReaderMode(this, readerCallback, nfcflags, new Bundle());
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save config object
+        Gson gson = new Gson();
+        savedInstanceState.putString("config", gson.toJson(config));
+        savedInstanceState.putInt("current_tab", tabHost.getCurrentTab());
+        super.onSaveInstanceState(savedInstanceState);
     }
 }

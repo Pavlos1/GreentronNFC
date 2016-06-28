@@ -1,6 +1,5 @@
 package au.com.greentron.nfcconfiguration;
 
-import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,8 +35,7 @@ public class EditConfig extends AppCompatActivity {
         setContentView(R.layout.edit_config);
 
         // Get configuration object passed from MainActivity
-        String configStr = (String) getIntent().getExtras().get("config");
-        android.util.Log.d("wtf", getIntent().getExtras().toString());
+        String configStr = getIntent().getExtras().getString("config");
         Gson gson = new Gson();
         config = gson.fromJson(configStr, Configuration.class);
 
@@ -88,10 +86,18 @@ public class EditConfig extends AppCompatActivity {
                     showError("A serial number is required");
                     return;
                 }
-                long pan_id = Long.parseLong(pan_idEntry.getText().toString());
-                long channel = Long.parseLong(channelEntry.getText().toString());
-                long serial_number = Long.parseLong(serial_numberEntry.getText().toString());
-                String name = nameEntry.getText().toString();
+                config.pan_id = Long.parseLong(pan_idEntry.getText().toString());
+                if (config.pan_id > 65535) {
+                    showError("PAN ID cannot exceed 65535");
+                    return;
+                }
+                config.channel = Long.parseLong(channelEntry.getText().toString());
+                if (config.channel > 65535) {
+                    showError("Channel cannot exceed 65535");
+                    return;
+                }
+                config.serial_number = Long.parseLong(serial_numberEntry.getText().toString());
+                config.name = nameEntry.getText().toString();
             }
         });
     }
