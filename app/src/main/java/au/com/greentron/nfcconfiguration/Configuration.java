@@ -1,7 +1,6 @@
 package au.com.greentron.nfcconfiguration;
 
 public class Configuration {
-    public boolean initialized = false;
     public long serial_number;
     public long sensor_type;
     public long pan_id;

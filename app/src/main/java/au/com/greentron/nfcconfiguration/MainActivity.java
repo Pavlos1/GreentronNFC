@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -125,18 +126,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void handleMessage(Message msg) {
                 // If user is currently on help tab, direct them to data tab
-                if (tabHost.getCurrentTab() == 2) { tabHost.setCurrentTab(0); }
-
                 switch (msg.what) {
                     case Constants.WORKER_EXIT_SUCCESS:
+                        if (tabHost.getCurrentTab() == 2) { tabHost.setCurrentTab(0); }
                         config = (Configuration) msg.obj;
-                        updateUIElements();
+                        if(updateUIElements()) {
+                            Toast.makeText(getApplicationContext(), "Tag read successfully",
+                                    Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case Constants.WORKER_FATAL_ERROR:
-                        dataField.setText("Got fatal error:\n");
-                        dataField.append(msg.obj.toString());
-                        dataField.append("\n");
-                        tabHost.setCurrentTab(0);
+                        Toast.makeText(getApplicationContext(), msg.obj.toString(),
+                                Toast.LENGTH_LONG).show();
                         break;
                 }
             }

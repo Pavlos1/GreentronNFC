@@ -1,6 +1,7 @@
 package au.com.greentron.nfcconfiguration;
 
 import android.nfc.Tag;
+import android.nfc.TagLostException;
 import android.nfc.tech.MifareUltralight;
 import android.os.Handler;
 
@@ -128,11 +129,14 @@ class TagRead extends Thread {
             obj.data = data;
             uiHandler.obtainMessage(Constants.WORKER_EXIT_SUCCESS, obj).sendToTarget();
 
+        } catch (NullPointerException e) {
+            String error = "Wrong type of card";
+            uiHandler.obtainMessage(Constants.WORKER_FATAL_ERROR, error).sendToTarget();
+        } catch (TagLostException e) {
+            String error="Tag was lost, try again";
+            uiHandler.obtainMessage(Constants.WORKER_FATAL_ERROR, error).sendToTarget();
         } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            uiHandler.obtainMessage(Constants.WORKER_FATAL_ERROR, sw.toString()).sendToTarget();
+            uiHandler.obtainMessage(Constants.WORKER_FATAL_ERROR, e.getMessage()).sendToTarget();
         }
     }
 }
