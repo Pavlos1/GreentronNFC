@@ -6,4 +6,7 @@ public class Constants {
     public static final int WORKER_DISABLE_CANCEL = 2;
     public static final int WORKER_PRINT_MESSAGE = 3;
     public static final int WORKER_EXIT_SUCCESS = 4;
+
+    public static final int DIALOG_CANCEL = 5;
+    public static final int DIALOG_START = 6;
 }

@@ -9,9 +9,13 @@
     <string name="channel">Channel:</string>
     <string name="help_text">Really detailed help section . . .</string>
     <string name="edit_config">Edit Config</string>
+    <string name="edit_configuration">Edit Configuration</string>
     <string name="flash">Flash</string>
     <string name="enter_serial_number">For security purposes, please enter the serial number\nof this device.</string>
     <string name="config_directions">Touch any value to edit its contents.</string>
     <string name="serial_hint">0000000000</string>
     <string name="five_digit_blank">00000</string>
+    <string name="approach_tag_now">Approach Device</string>
+    <string name="cancel">Cancel</string>
+    <string name="write_configuration">Write Configuration</string>
 </resources>
