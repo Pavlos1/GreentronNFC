@@ -42,9 +42,9 @@ public class MainActivity extends AppCompatActivity {
         configPAN_ID.setText(String.valueOf(config.pan_id));
         configChannel.setText(String.valueOf(config.channel));
 
-        dataField.setText("Got data:\n");
+        dataField.setText(getResources().getString(R.string.got_data));
         for (int i=0; i<config.data.length; i++) {
-            dataField.append("Page ");
+            dataField.append(getResources().getString(R.string.page));
             dataField.append(String.valueOf(i));
             dataField.append(": ");
             dataField.append(String.valueOf(config.data[i]));
@@ -79,21 +79,21 @@ public class MainActivity extends AppCompatActivity {
         tabHost.setup();
 
         // Data Tab
-        TabHost.TabSpec spec = tabHost.newTabSpec("Data");
+        TabHost.TabSpec spec = tabHost.newTabSpec(getResources().getString(R.string.data_tab_label));
         spec.setContent(R.id.datatab);
-        spec.setIndicator("Data");
+        spec.setIndicator(getResources().getString(R.string.data_tab_label));
         tabHost.addTab(spec);
 
         //Config Tab
-        spec = tabHost.newTabSpec("Config");
+        spec = tabHost.newTabSpec(getResources().getString(R.string.config_tab_label));
         spec.setContent(R.id.configtab);
-        spec.setIndicator("Config");
+        spec.setIndicator(getResources().getString(R.string.config_tab_label));
         tabHost.addTab(spec);
 
         // Help Tab
-        spec = tabHost.newTabSpec("Help");
+        spec = tabHost.newTabSpec(getResources().getString(R.string.help_tab_label));
         spec.setContent(R.id.helptab);
-        spec.setIndicator("Help");
+        spec.setIndicator(getResources().getString(R.string.help_tab_label));
         tabHost.addTab(spec);
 
         // Set tab label size
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
                         if (tabHost.getCurrentTab() == 2) { tabHost.setCurrentTab(0); }
                         config = (Configuration) msg.obj;
                         if(updateUIElements()) {
-                            Toast.makeText(getApplicationContext(), "Tag read successfully",
+                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.tag_read_success),
                                     Toast.LENGTH_SHORT).show();
                         }
                         break;

@@ -18,4 +18,18 @@
     <string name="approach_tag_now">Approach Device</string>
     <string name="cancel">Cancel</string>
     <string name="write_configuration">Write Configuration</string>
+    <string name="press_flash_before_approaching_device">Press "FLASH" before approaching device</string>
+    <string name="name_required">A name is required</string>
+    <string name="name_too_long">Name cannot exceed 32 characters</string>
+    <string name="pan_id_required">A PAN ID is required</string>
+    <string name="channel_required">A channel is required</string>
+    <string name="serial_number_required">A serial number is required</string>
+    <string name="pan_id_too_long">PAN ID cannot exceed 65535</string>
+    <string name="channel_too_long">Channel cannot exceed 65535</string>
+    <string name="tag_read_success">Tag read successfully</string>
+    <string name="got_data">Got data:\n</string>
+    <string name="page">Page: </string>
+    <string name="data_tab_label">Data</string>
+    <string name="config_tab_label">Config</string>
+    <string name="help_tab_label">Help</string>
 </resources>

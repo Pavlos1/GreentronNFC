@@ -88,8 +88,8 @@ public class EditConfig extends AppCompatActivity {
         inactiveCallback = new NfcAdapter.ReaderCallback() {
             @Override
             public void onTagDiscovered(Tag tag) {
-                uiHandler.obtainMessage(Constants.WORKER_PRINT_MESSAGE,
-                        "Press \"FLASH\" before approaching tag").sendToTarget();
+                uiHandler.obtainMessage(Constants.WORKER_PRINT_MESSAGE, getResources().
+                        getString(R.string.press_flash_before_approaching_device)).sendToTarget();
             }
         };
 
@@ -139,32 +139,32 @@ public class EditConfig extends AppCompatActivity {
             public void onClick(View view) {
                 // Verify input data
                 if (nameEntry.getText().toString().length() == 0) {
-                    showError("A name is required");
+                    showError(getResources().getString(R.string.name_required));
                     return;
                 }
                 if (nameEntry.getText().toString().length() > 32) {
-                    showError("Name cannot exceed 32 characters");
+                    showError(getResources().getString(R.string.name_too_long));
                 }
                 if (pan_idEntry.getText().toString().length() == 0) {
-                    showError("A PAN ID is required");
+                    showError(getResources().getString(R.string.pan_id_required));
                     return;
                 }
                 if (channelEntry.getText().toString().length() == 0) {
-                    showError("A channel is required");
+                    showError(getResources().getString(R.string.channel_required));
                     return;
                 }
                 if (serial_numberEntry.getText().toString().length() == 0) {
-                    showError("A serial number is required");
+                    showError(getResources().getString(R.string.serial_number_required));
                     return;
                 }
                 config.pan_id = Long.parseLong(pan_idEntry.getText().toString());
                 if (config.pan_id > 65535) {
-                    showError("PAN ID cannot exceed 65535");
+                    showError(getResources().getString(R.string.pan_id_too_long));
                     return;
                 }
                 config.channel = Long.parseLong(channelEntry.getText().toString());
                 if (config.channel > 65535) {
-                    showError("Channel cannot exceed 65535");
+                    showError(getResources().getString(R.string.channel_too_long));
                     return;
                 }
                 config.serial_number = Long.parseLong(serial_numberEntry.getText().toString());
