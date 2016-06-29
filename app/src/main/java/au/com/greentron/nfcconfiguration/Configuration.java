@@ -5,6 +5,6 @@ public class Configuration {
     public long sensor_type;
     public long pan_id;
     public long channel;
-    public String name;
+    public byte[] name;
     public long[] data;
 }

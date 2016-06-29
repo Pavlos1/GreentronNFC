@@ -1,5 +1,6 @@
 package au.com.greentron.nfcconfiguration;
 
+import android.content.Context;
 import android.nfc.Tag;
 import android.nfc.TagLostException;
 import android.nfc.tech.MifareUltralight;
@@ -11,11 +12,13 @@ import java.io.StringWriter;
 class TagRead extends Thread {
     Handler uiHandler;
     Tag tag;
+    Context context;
 
-    public TagRead(Handler uiHandler, Tag tag) {
+    public TagRead(Context context, Handler uiHandler, Tag tag) {
         super();
         this.uiHandler = uiHandler;
         this.tag = tag;
+        this.context = context;
     }
 
     // See: https://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java
@@ -125,7 +128,7 @@ class TagRead extends Thread {
             obj.sensor_type = sensor_type;
             obj.pan_id = pan_id;
             obj.channel = channel;
-            obj.name = new String(name, "ISO-8859-1");
+            obj.name = name;
             obj.data = data;
             uiHandler.obtainMessage(Constants.WORKER_EXIT_SUCCESS, obj).sendToTarget();
 

@@ -11,7 +11,9 @@
     <string name="edit_config">Edit Config</string>
     <string name="edit_configuration">Edit Configuration</string>
     <string name="flash">Flash</string>
-    <string name="enter_serial_number">For security purposes, please enter the serial number\nof this device.</string>
+    <string name="enter_serial_number">
+        For security purposes, please enter the serial number\nof this device:
+    </string>
     <string name="config_directions">Touch any value to edit its contents.</string>
     <string name="serial_hint">0000000000</string>
     <string name="five_digit_blank">00000</string>
@@ -32,4 +34,12 @@
     <string name="data_tab_label">Data</string>
     <string name="config_tab_label">Config</string>
     <string name="help_tab_label">Help</string>
+    <string name="fields_dont_match">One or more fields were not updated successfully</string>
+    <string name="something_went_wrong">
+        Something has gone very wrong. Try scanning the tag again.
+        If the issue persists, please file a bug report.
+    </string>
+    <string name="name_parse_error">!!NAME PARSE ERROR!!</string>
+    <string name="name_must_be_ascii">Name must be ASCII</string>
+    <string name="tag_write_failed">Failed to write tag</string>
 </resources>

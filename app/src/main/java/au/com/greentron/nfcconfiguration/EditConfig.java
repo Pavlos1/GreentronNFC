@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.io.UnsupportedEncodingException;
+
 public class EditConfig extends AppCompatActivity {
     Toolbar actionBar;
     EditText nameEntry;
@@ -53,13 +55,37 @@ public class EditConfig extends AppCompatActivity {
         // I cannot believe I have to do this.
         me = this;
 
-        // UI handler for creating toasts
+        // Handler for both the TagRead thread and NfcAdapter callbacks
         uiHandler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what) {
+                    case Constants.WORKER_EXIT_SUCCESS:
+                        // TODO: remove the old dialog, display the OK dialog
+                        Toast.makeText(getApplicationContext(), getResources()
+                                .getString(R.string.tag_read_success), Toast.LENGTH_SHORT).show();
+                        nfcAdapter.enableReaderMode(me, inactiveCallback, nfcflags, new Bundle());
+                        dialog.dismiss();
+                        finish();
+                        break;
+                    case Constants.WORKER_FATAL_ERROR:
+                        // TODO: remove old dialog, display failure dialog
+                        Toast.makeText(getApplicationContext(), msg.obj.toString(),
+                                Toast.LENGTH_LONG).show();
+                        nfcAdapter.enableReaderMode(me, inactiveCallback, nfcflags, new Bundle());
+                        dialog.dismiss();
+                        break;
+                    case Constants.WORKER_READ_BACK_ERROR:
+                        // TODO: remove old dialog, display failure dialog
+                        Toast.makeText(getApplicationContext(), msg.obj.toString(),
+                                Toast.LENGTH_LONG).show();
+                        nfcAdapter.enableReaderMode(me, inactiveCallback, nfcflags, new Bundle());
+                        dialog.dismiss();
+                        break;
+                    // To tell the user something, via toast, before the tag is scanned
                     case Constants.WORKER_PRINT_MESSAGE:
-                        Toast.makeText(getApplicationContext(), msg.obj.toString(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), msg.obj.toString(),
+                                Toast.LENGTH_LONG).show();
                         break;
                     case Constants.DIALOG_CANCEL:
                         nfcAdapter.enableReaderMode(me, inactiveCallback, nfcflags, new Bundle());
@@ -97,8 +123,7 @@ public class EditConfig extends AppCompatActivity {
         activeCallback = new NfcAdapter.ReaderCallback() {
             @Override
             public void onTagDiscovered(Tag tag) {
-                uiHandler.obtainMessage(Constants.WORKER_PRINT_MESSAGE,
-                        "This is where I'd try to write the tag").sendToTarget();
+                (new TagWrite(getApplicationContext(), uiHandler, tag, config)).start();
             }
         };
 
@@ -126,7 +151,14 @@ public class EditConfig extends AppCompatActivity {
         flashButton = (Button) findViewById(R.id.flash_config);
 
         // Fill in fields that are given in the config object
-        if (config.name != null) { nameEntry.setText(config.name); }
+        if (config.name != null) {
+            try {
+                nameEntry.setText(new String(config.name, "ISO-8859-1"));
+            } catch (UnsupportedEncodingException e) {
+                // this should never happen
+                nameEntry.setText(getResources().getString(R.string.name_parse_error));
+            }
+        }
         pan_idEntry.setText(String.valueOf(config.pan_id));
         channelEntry.setText(String.valueOf(config.channel));
 
@@ -144,6 +176,7 @@ public class EditConfig extends AppCompatActivity {
                 }
                 if (nameEntry.getText().toString().length() > 32) {
                     showError(getResources().getString(R.string.name_too_long));
+                    return;
                 }
                 if (pan_idEntry.getText().toString().length() == 0) {
                     showError(getResources().getString(R.string.pan_id_required));
@@ -168,7 +201,13 @@ public class EditConfig extends AppCompatActivity {
                     return;
                 }
                 config.serial_number = Long.parseLong(serial_numberEntry.getText().toString());
-                config.name = nameEntry.getText().toString();
+
+                try {
+                    config.name = nameEntry.getText().toString().getBytes("ISO-8859-1");
+                } catch (UnsupportedEncodingException e) {
+                    showError(getResources().getString(R.string.name_must_be_ascii));
+                    return;
+                }
 
                 // Set callback to write the tag
                 uiHandler.obtainMessage(Constants.DIALOG_START).sendToTarget();

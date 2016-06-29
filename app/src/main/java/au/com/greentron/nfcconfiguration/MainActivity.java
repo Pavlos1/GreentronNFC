@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.io.UnsupportedEncodingException;
+
 public class MainActivity extends AppCompatActivity {
     Handler uiHandler;
     NfcAdapter.ReaderCallback readerCallback;
@@ -38,7 +40,15 @@ public class MainActivity extends AppCompatActivity {
         }
         dataSensorType.setText(String.valueOf(config.sensor_type));
         configSensorType.setText(String.valueOf(config.sensor_type));
-        configName.setText(config.name);
+        try {
+            configName.setText(new String(config.name, "ISO-8859-1"));
+        } catch (UnsupportedEncodingException e) {
+            // this should never happen
+            config = null;
+            Toast.makeText(getApplicationContext(), getResources()
+                    .getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
+            return false;
+        }
         configPAN_ID.setText(String.valueOf(config.pan_id));
         configChannel.setText(String.valueOf(config.channel));
 
@@ -99,7 +109,8 @@ public class MainActivity extends AppCompatActivity {
         // Set tab label size
         for(int i=0; i<tabHost.getTabWidget().getChildCount(); i++)
         {
-            TextView tv = (TextView) tabHost.getTabWidget().getChildAt(i).findViewById(android.R.id.title);
+            TextView tv = (TextView) tabHost.getTabWidget().getChildAt(i)
+                    .findViewById(android.R.id.title);
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         }
 
@@ -148,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         readerCallback = new NfcAdapter.ReaderCallback() {
             @Override
             public void onTagDiscovered(Tag tag) {
-                (new TagRead(uiHandler, tag)).start();
+                (new TagRead(getApplicationContext(), uiHandler, tag)).start();
             }
         };
         int nfcflags = NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK | NfcAdapter.FLAG_READER_NFC_A;
