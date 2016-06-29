@@ -31,7 +31,7 @@ public class EditConfig extends AppCompatActivity {
     Configuration config;
     Handler uiHandler;
     AlertDialog dialog;
-    AppCompatActivity me;
+    EditConfig me;
 
     NfcAdapter nfcAdapter;
     NfcAdapter.ReaderCallback inactiveCallback;
@@ -63,7 +63,7 @@ public class EditConfig extends AppCompatActivity {
                     case Constants.WORKER_EXIT_SUCCESS:
                         // TODO: remove the old dialog, display the OK dialog
                         Toast.makeText(getApplicationContext(), getResources()
-                                .getString(R.string.tag_read_success), Toast.LENGTH_SHORT).show();
+                                .getString(R.string.tag_write_success), Toast.LENGTH_SHORT).show();
                         nfcAdapter.enableReaderMode(me, inactiveCallback, nfcflags, new Bundle());
                         dialog.dismiss();
                         finish();

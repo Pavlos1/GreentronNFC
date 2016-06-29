@@ -28,9 +28,10 @@
     <string name="serial_number_required">A serial number is required</string>
     <string name="pan_id_too_long">PAN ID cannot exceed 65535</string>
     <string name="channel_too_long">Channel cannot exceed 65535</string>
-    <string name="tag_read_success">Tag read successfully</string>
+    <string name="tag_read_success">Configuration read successfully</string>
+    <string name="tag_write_success">Configuration written successfully</string>
     <string name="got_data">Got data:\n</string>
-    <string name="page">Page: </string>
+    <string name="page">Page </string>
     <string name="data_tab_label">Data</string>
     <string name="config_tab_label">Config</string>
     <string name="help_tab_label">Help</string>

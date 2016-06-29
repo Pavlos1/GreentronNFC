@@ -16,7 +16,6 @@ public class TagWrite extends Thread {
     Tag tag;
     Configuration config;
     Context context;
-    boolean readThreadReturned;
 
     public TagWrite(Context context, Handler uiHandler, Tag tag, Configuration config) {
         super();
@@ -34,13 +33,18 @@ public class TagWrite extends Thread {
         }
     }
 
+    public void safeLooperQuit() {
+        Looper myLooper = Looper.myLooper();
+        if (myLooper != null) {
+            myLooper.quit();
+        }
+    }
+
     @Override
     public void run() {
-        readThreadReturned = false;
-
         // Set up handler to check the read thread's result
         Looper.prepare();
-        writeWorkerHandler = new Handler() {
+        writeWorkerHandler = new Handler(Looper.myLooper()) {
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what) {
@@ -55,11 +59,13 @@ public class TagWrite extends Thread {
                                     .getResources().getString(R.string.fields_dont_match))
                                     .sendToTarget();
                         }
-                        readThreadReturned = true;
+                        safeLooperQuit();
                         break;
                     case Constants.WORKER_FATAL_ERROR:
                         uiHandler.obtainMessage(Constants.WORKER_READ_BACK_ERROR, msg.obj.toString())
                                 .sendToTarget();
+                        safeLooperQuit();
+                        break;
                 }
             }
         };
@@ -74,7 +80,7 @@ public class TagWrite extends Thread {
         data[0][2] = 'R';
         data[0][3] = 'N';
 
-        // write 4-byte config parameters
+        // write 4-byte config parameters, and serial number
         for (i=0; i<4; i++) {
             offset = (3 - i)*8;
             // serial number
@@ -87,7 +93,7 @@ public class TagWrite extends Thread {
             data[0x04][i] = (byte) ((config.channel & (0xffL << offset)) >> offset);
         }
 
-        // write name
+        // write name, padding unused space with zeroes
         for (i=0; i<config.name.length; i++) {
             data[0x05 + (i / 4)][i % 4] = config.name[i];
         }
@@ -95,11 +101,10 @@ public class TagWrite extends Thread {
             data[0x05 + (i / 4)][i % 4] = (byte) 0;
         }
 
-        // write 4 data blocks
-        for (i=0; i<config.data.length; i++) {
+        // config.data blocks are ignored; write zeroes
+        for (i=0; i<4; i++) {
             for (j=0; j<4; j++) {
-                offset = (3 - i)*8;
-                data[0x0D + i][j] = (byte) ((config.data[i] & (0xffL << offset)) >> offset);
+                data[0x0D + i][j] = (byte) 0;
             }
         }
 
@@ -158,7 +163,7 @@ public class TagWrite extends Thread {
         // wait for the microcontroller to update the config
         safeSleep(100);
 
-        // start read thread, and loop until it finishes
+        // start read thread, and wait until it finishes
         (new TagRead(context, writeWorkerHandler, tag)).start();
         Looper.loop();
     }
